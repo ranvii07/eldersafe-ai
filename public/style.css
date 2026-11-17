@@ -5,6 +5,7 @@ header h1 { margin: 0; font-size: 22px; }
 header p { margin: 2px 0 0; color: #94a3b8; font-size: 13px; }
 nav { display: flex; gap: 4px; padding: 0 24px; background: #fff; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
 .tab { background: none; color: #475569; border: 0; border-bottom: 3px solid transparent; border-radius: 0; padding: 12px 14px; }
+.tab:hover { background: #f1f5f9; color: #1e293b; }
 .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
 .panel { display: none; padding: 20px 24px; max-width: 1150px; margin: 0 auto; }
 .panel.active { display: block; }
