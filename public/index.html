@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ElderSafe AI – Fall Detection & Caregiver Alert</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>ElderSafe AI</h1>
+      <p>Camera-based fall detection with caregiver alerts · UR Fall Detection Dataset · MediaPipe Pose</p>
+    </div>
+    <span id="storage" class="pill">checking storage…</span>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="monitor">Monitor</button>
+    <button class="tab" data-tab="contacts">Contacts</button>
+    <button class="tab" data-tab="history">Alert history</button>
+    <button class="tab" data-tab="evaluate">Evaluate model</button>
+  </nav>
+
+  <!-- MONITOR -->
+  <section id="monitor" class="panel active">
+    <div class="grid">
+      <div>
+        <div class="row">
+          <button id="srcCam">Live webcam</button>
+          <label class="btn">UR clip (.zip of frames)<input id="srcZip" type="file" accept=".zip" hidden /></label>
+          <label class="btn">Video file (.mp4)<input id="srcVid" type="file" accept="video/*" hidden /></label>
+          <button id="stop" class="ghost">Stop</button>
+        </div>
+        <div class="stage">
+          <canvas id="canvas" width="640" height="480"></canvas>
+          <div id="placeholder">Choose a source above. For the demo, load a UR clip such as <b>fall-01-cam0-rgb.zip</b>.</div>
+        </div>
+        <video id="video" playsinline muted hidden></video>
+        <div id="banner" class="banner hidden"></div>
+      </div>
+      <aside>
+        <h3>Live status</h3>
+        <div class="stat"><span>Model</span><b id="mpStatus">not loaded</b></div>
+        <div class="stat"><span>Posture</span><b id="posture">–</b></div>
+        <div class="stat"><span>Torso angle</span><b id="angle">–</b></div>
+        <div class="stat"><span>Body box ratio (w/h)</span><b id="ratio">–</b></div>
+        <div class="stat"><span>Frame</span><b id="frameNo">–</b></div>
+        <h3>Model thresholds</h3>
+        <div id="modelInfo" class="small"></div>
+        <h3>Pipeline</h3>
+        <ol class="small">
+          <li>Video / camera frames</li>
+          <li>MediaPipe Pose – 33 body landmarks</li>
+          <li>Preprocessing – median fill, mode smoothing</li>
+          <li>Fall rule – lying + fast hip drop + held</li>
+          <li>Back end alerts saved contacts</li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="contacts" class="panel">
+    <div class="grid">
+      <form id="contactForm" class="card">
+        <h3>Add a relative / caregiver</h3>
+        <input name="name" placeholder="Name *" required />
+        <input name="relation" placeholder="Relation (e.g. Son)" />
+        <input name="phone" placeholder="Phone number * (with country code, e.g. 919876543210)" required />
+        <input name="email" type="email" placeholder="Email (for automatic alert email)" />
+        <textarea name="address" placeholder="Address"></textarea>
+        <button type="submit">Save contact</button>
+        <p id="contactMsg" class="small"></p>
+      </form>
+      <div class="card">
+        <h3>Saved contacts <small>(stored in the back end)</small></h3>
+        <div id="contactList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history" class="panel">
+    <div class="card">
+      <div class="row"><h3>Alerts sent by the back end</h3><button id="refreshHist" class="ghost">Refresh</button></div>
+      <div id="histList"></div>
+    </div>
+  </section>
+
+  <!-- EVALUATE -->
+  <section id="evaluate" class="panel">
+    <div class="card">
+      <h3>Test the model on the UR Fall dataset (leave-one-clip-out)</h3>
+      <p class="small">
+        Each clip is labelled from its name (<b>fall-xx → 1</b>, <b>adl-xx → 0</b>). Landmarks go through
+        preprocessing (<b>median</b> fills missing body points and smooths noise, <b>mode</b> picks the majority posture
+        in each short window). The thresholds are then learned on 18 clips and tested on the clip that was left out,
+        repeated for all 19 clips.
+      </p>
+      <div class="row">
+        <button id="evalBundled">Run on our 19 UR clips (pre-extracted landmarks)</button>
+        <label class="btn">Or extract from UR zip files…<input id="evalZips" type="file" accept=".zip" multiple hidden /></label>
+      </div>
+      <p id="evalStatus" class="small"></p>
+      <div id="evalOut"></div>
+    </div>
+  </section>
+
+  <footer>
+    Student prototype. It reports a <b>possible</b> fall only, does not diagnose injury and is not a certified medical
+    or emergency system. Dataset: UR Fall Detection Dataset (Kwolek &amp; Kepski, 2014).
+  </footer>
+
+  <script src="core.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
